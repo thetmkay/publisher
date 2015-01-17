@@ -1,0 +1,26 @@
+{
+  "name": "nodeprototype",
+  "version": "0.0.0",
+  "description": "nodeprototype =============",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/thetmkay/nodeprototype.git"
+  },
+  "author": "thetmkay@gmail.com",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/thetmkay/nodeprototype/issues"
+  },
+  "homepage": "https://github.com/thetmkay/nodeprototype",
+  "dependencies": {
+    "express": "~4.9.8",
+    "consolidate": "~0.10.0",
+    "nunjucks": "~1.1.0",
+    "underscore": "~1.7.0"
+  }
+}
