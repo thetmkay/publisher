@@ -1,0 +1,11 @@
+<template id="form-template">
+ <form>
+  {% for field in fields %}
+  <fieldset>
+  <legend>
+   {{field.title}} 
+  </legend>
+  <input type="text" />
+ </form>
+ {% endfor %}
+</template>

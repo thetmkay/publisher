@@ -1,0 +1,12 @@
+<script>
+
+ console.log(2);
+ var body = document.getElementsByTagName('body')[0];
+ var div = document.createElement('div');
+ div.classList.add('overlay');
+ var template = document.getElementById('form-template');
+ var clone = document.importNode(template.querySelector('form')[0], null);
+ div.appendChild(clone);
+ body.insertBefore(div, body.firstChild);
+ 
+</script>

@@ -8,7 +8,7 @@ module.exports = function(path, options, fn) {
     return;
    }   
 
-   function replacer(match, p1, offset, string) {
+   function wrapDiv(match, p1, offset, string) {
      console.log(p1);
      return '<div>' + p1 + '</div>';
    }
@@ -24,12 +24,35 @@ module.exports = function(path, options, fn) {
     return _.uniq(matches);
    }
 
-   var regExp = new RegExp("(?:<body>)(\{\{[^\}]*\}\})(?:<\/body>)", "g");
-   var text = data.replace(regExp, replacer);
-   console.log(text);
-   console.log(data);
-   console.log(data.match(regExp));
+   function injectScript(match, p1, offset, string) {
+     //var script = '<script>console.log(1)</script>';
 
+     var script = fs.readFileSync(__dirname + '/script.html', {encoding:'utf8'});     
+
+     return script + p1;     
+   }
+
+   function injectTemplate(match, p1, offset, string) {
+
+    var template = fs.readFileSync(__dirname + '/overlay.html', {encoding: 'utf8'});
+    
+    console.log(string);
+
+    return nunjucks.renderString(template,{fields:[{legend:'title'}]});
+   }
+
+   function injectStyle(match, p1, offset, string) {
+    var css = fs.readFileSync(__dirname + '/style.css', {encoding:'utf8'});
+    return '<style>' + css + '</style>' + p1;
+   }
+
+   var regExp = new RegExp("(?:<body>)(\{\{[^\}]*\}\})(?:<\/body>)", "g");
+   var text = data.replace(regExp, wrapDiv);
+   var endTag = new RegExp("(<\/body>)", "g");
+   var headTag = new RegExp("(<\/head>)", "g");
+   text = text.replace(endTag, injectTemplate);
+   text = text.replace(endTag, injectScript);
+   text = text.replace(headTag, injectStyle);
    console.log(extract(text));
    nunjucks.renderString(text, options, fn);
 
