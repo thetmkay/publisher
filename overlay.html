@@ -3,9 +3,16 @@
   {% for field in fields %}
   <fieldset>
   <legend>
-   {{field.title}} 
+   {{field.legend}} 
   </legend>
-  <input type="text" />
- </form>
+  {% if field.type == 'text' %}
+  <input type="text" class="gnp-input" name="{{field.legend}}" />
+  {% elif field.type == 'date' %}
+  <input type="date" class="gnp-input" name="{{field.legend}}"/>
+  {% elif field.type == 'md' %}
+  <h4 class="gnp-input">dropbox</h4>
+  {% endif %}
+</fieldset>
  {% endfor %}
+ </form>
 </template>
