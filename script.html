@@ -1,28 +1,5 @@
-<script>
-
- console.log(2);
- var body = document.body;
- var div = document.createElement('div');
- div.classList.add('overlay');
- var template = document.getElementById('form-template').content;
- var clone = document.importNode(template.querySelector('form'), true);
- div.appendChild(clone);
- body.insertBefore(div, body.firstChild);
- 
- var watch_divs = document.getElementsByClassName('gnp-watch'); 
- var watch_inputs = document.getElementsByClassName('gnp-input'); 
- console.log(watch_inputs);
- for(var i = 0; i < watch_inputs.length; i++) {
-   var watch_input = watch_inputs[i];
-   watch_input.addEventListener("input", function() {
-   console.log("data-gnp-key=" + this.name);
-   var update_targets = document.querySelectorAll("[data-gnp-key=" + this.name + "]");
-   if(update_targets) {
-     for(var i = 0; i < update_targets.length; i++) {
-      update_targets[i].innerHTML = this.value;
-     }
-   }
-  });
- }
-
-</script>
+<script type="text/javascript" src="/js/nunjucks.js"></script>
+<script type="text/javascript" src="/js/filepicker.js"></script>
+<script type-"text/javascript" src="/js/marked.js"></script>
+<script type-"text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/dropbox.js/0.10.2/dropbox.min.js"></script>
+<script type="text/javascript" src="/js/publisher.js"></script>

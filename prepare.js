@@ -20,12 +20,23 @@ module.exports = function(path, options, fn) {
 
      return script + p1;     
    }
+   
+   function insertClass(match, p1, p2, p3, p4, offset, string){
+     var index = p1.indexOf('class="');
+     var addition = 'data-gnp-value="' + escape(p2) + '" ' + 'data-gnp-key=' + p4.trim() + ' class="gnp-watch' 
+     if(index === -1) {
+       return p1.substring(0, p1.length - 1) + ' ' + addition + '">' + p2;
+     }
+    
+     return p1.replace(/class="/, function(match, p5, offset, string) {
+       return  addition + ' ';
+     }) + p2 + p3;
+
+   }
 
    function injectTemplate(match, p1, offset, string) {
 
     var template = fs.readFileSync(__dirname + '/overlay.html', {encoding: 'utf8'});
-    
-    console.log(string);
 
     var json = require('./index.json');
     
@@ -45,10 +56,11 @@ module.exports = function(path, options, fn) {
     var css = fs.readFileSync(__dirname + '/style.css', {encoding:'utf8'});
     return '<style>' + css + '</style>' + p1;
    }
-   var headText = data.substring(0,data.indexOf("<body>"));
-   var bodyText = data.substring(data.indexOf("<body>"));
-   var regExp = new RegExp("(\{\{([^\}]*)\}\})", "g");
-   var text = headText +  bodyText.replace(regExp, wrapSpan);
+//   var headText = data.substring(0,data.indexOf("<body>"));
+ //  var bodyText = data.substring(data.indexOf("<body>"));
+//   var regExp = new RegExp("(\{\{([^\}]*)\}\})", "g");
+   var regExp = new RegExp("(<[^<>]*>)([^<>]*(\{\{([^\}]*)\}\}))", "g");
+   var text = data.replace(regExp, insertClass);
    console.log(text);
    var endTag = new RegExp("(<\/body>)", "g");
    var headTag = new RegExp("(<\/head>)", "g");

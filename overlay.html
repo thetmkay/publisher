@@ -6,11 +6,11 @@
    {{field.legend}} 
   </legend>
   {% if field.type == 'text' %}
-  <input type="text" class="gnp-input" name="{{field.legend}}" />
+  <input type="text" class="gnp-input" data-gnp-type="{{field.type}}" name="{{field.legend}}" />
   {% elif field.type == 'date' %}
-  <input type="date" class="gnp-input" name="{{field.legend}}"/>
+  <input type="date" class="gnp-input" data-gnp-type="{{field.type}}" name="{{field.legend}}"/>
   {% elif field.type == 'md' %}
-  <h4 class="gnp-input">dropbox</h4>
+  <select class="gnp-input" name="{{field.legend}}" data-gnp-type="{{field.type}}"></select>
   {% endif %}
 </fieldset>
  {% endfor %}
