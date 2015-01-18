@@ -1,5 +1,9 @@
  
 var watch_list = [];
+var context = new Context();
+
+
+
 
 function createOverlay() {
  var body = document.body;
@@ -13,13 +17,11 @@ function createOverlay() {
 
 function replaceContent(key, value) {
    var update_targets = document.querySelectorAll("[data-gnp-key=" + key + "]");
-   var context = {};
-   context[key] = value;
-   
+   context.update(key, value); 
    if(update_targets) {
      for(var i = 0; i < update_targets.length; i++) {
       var template = unescape(update_targets[i].getAttribute('data-gnp-value'));
-      update_targets[i].innerHTML = nunjucks.renderString(template, context);
+      update_targets[i].innerHTML = nunjucks.renderString(template, context.get());
      }
    }
 }
@@ -34,6 +36,24 @@ function bindInputs() {
     replaceContent(this.name, this.value); 
    });
  }
+}
+
+function bindSave() {
+
+}
+
+function bindPublish() {
+  var button = document.getElementById('gnp-publish');
+  if(!button) {
+   console.error("Could Not Find Publish Button");
+   return;
+  }
+
+  function onPublish() {
+    console.log(context.print());
+  }
+
+  button.addEventListener("click", onPublish);
 }
 
 function addToWatchList(node, file){
@@ -62,10 +82,6 @@ function dropbox() {
  });
  client.authenticate(function(error, client) {
     if (error) {
-        // Replace with a call to your own error-handling code.
-        //
-        // Don't forget to return from the callback, so you don't execute the code
-        // that assumes everything went well.
         console.log(error);
         return;
     }
@@ -110,6 +126,7 @@ function dropbox() {
     var selectPromise = filepicker(selectComp, optionPromise);
 
     selectPromise.then(function(selectNode) {
+      convertMD.call(selectNode);
       selectNode.addEventListener("change",convertMD);
     });
 
@@ -118,4 +135,6 @@ function dropbox() {
 
 createOverlay();
 bindInputs();
+bindPublish();
 dropbox();
+

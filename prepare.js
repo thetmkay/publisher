@@ -37,7 +37,7 @@ module.exports = function(path, options, fn) {
    function injectTemplate(match, p1, offset, string) {
 
     var template = fs.readFileSync(__dirname + '/overlay.html', {encoding: 'utf8'});
-
+    
     var json = require('./index.json');
     
     var keys = Object.keys(json);
