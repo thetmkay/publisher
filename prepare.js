@@ -1,19 +1,32 @@
-module.exports = function PublishPreview(options){
+module.exports = function PublishPreview(settings){
 
         var fs = require('fs'),
             _ = require('underscore');
+	    //watch = require('node-watch');
+	    
 
-        var module = {},
-            globals;
+        var module = {};
 
-        function init(options) {
-          globals = _.pick(options, ['dropbox_key']);
-        }
 
-	function render(path, options, fn) {
-	  var fs = require('fs');
+	function getBasename(path) {
+	  var views_dir = settings.view_dir || 'views';
+	  var path_reg = new RegExp('^.*/' + views_dir + '/(.*)$');
+	  var match = path.match(path_reg);
+	  return 'index.html';
+	}
+
+	function render(path, ops, fn) {
+	  var basename = getBasename(path),
+	      globals = {},
+	      template = settings['templates'][basename];
+
+	  if(template) {
+		globals.template = _.each(template, function(type,field, t) {
+		  t[field] = '';
+		});
+	  }
+
 	  var nunjucks = require('nunjucks');
-	  var _ = require('underscore');
 	//  var extract = require('./extract');
 	  fs.readFile(path, {encoding:'utf8'},function(error,data){
 	   if(error) {
@@ -27,10 +40,9 @@ module.exports = function PublishPreview(options){
 
 	   function renderScripts() {
 	     //var script = '<script>console.log(1)</script>';
-
 	     var script = fs.readFileSync(__dirname + '/script.html', {encoding:'utf8'});     
 
-	     return nunjucks.renderString(script, globals);     
+	     return nunjucks.renderString(script, { globals: JSON.stringify(globals) });     
 	   }
 	   
 	   function insertClass(match, p1, p2, p3, p4, offset, string){
@@ -85,19 +97,32 @@ module.exports = function PublishPreview(options){
 	//   var regExp = new RegExp("(\{\{([^\}]*)\}\})", "g");
 	   var regExp = new RegExp("(<[^<>]*>)([^<>]*(\{\{([^\}]*)\}\}))", "g");
 	   var text = data.replace(regExp, insertClass);
-	   console.log(text);
+	   //console.log(text);
 	   var endTag = new RegExp("(<\/body>)", "g");
 	   var headTag = new RegExp("(<\/head>)", "g");
 	   text = text.replace(endTag, injectInBody);
 	//   text = text.replace(endTag, injectScript);
 	   text = text.replace(headTag, injectStyle);
-	   nunjucks.renderString(text, options, fn);
+	   nunjucks.renderString(text, {}, fn);
 
 	  });
 	}
 
+	function setSockets(io) {
+	  io.on('connection', function(socket) {
+	   console.log('connected');
+           socket.on('watch file', function(path) {
+	     console.log('path: ' + path);
+             watch(path, function(fn) {
+		console.log(fn);
+	     });
+           }); 
+	  });
+	  
+        }
+
 	module.nunjucks = render;
-	init(options);
+	module.watch = setSockets;
 
 	return module;
 }

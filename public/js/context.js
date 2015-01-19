@@ -1,4 +1,4 @@
-function Context(template) {
+module.exports = function createContext(template) {
   var template = template || {};
   var c_index = 0;
   var list = [];
@@ -12,7 +12,12 @@ function Context(template) {
   }
 
   function clone(obj) {
-   return Object.create(Object.prototype,obj);
+   var newObj = {};
+   for(var prop in obj) {
+	newObj[prop] = obj[prop];
+   }
+
+   return newObj;
   }
 
   function switchContext(index) {
@@ -20,6 +25,11 @@ function Context(template) {
    stretchTo(index); 
   }
   module.switchContext = switchContext;
+
+  function isSameContext(index) {
+    return c_index === index;
+  }
+  module.isSameContext = isSameContext;
 
   function get(index) {
    if(!index && index !== 0) {

@@ -2,16 +2,13 @@
  * Module dependencies
  */
 
-var http = require('http'),
-  path = require('path');
+var app = require('./app');
 
-var app = require('./app')
 
 /**
  * Start Server
  */
 
-app.listen(app.get('port'), function () {
-  console.log('Express server listening on port ' + app.get('port'));
-});
-
+var server = app.listen(app.get('port'));
+var io = require('socket.io')(server);
+app.watch(io);

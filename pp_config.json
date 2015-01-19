@@ -1,3 +1,9 @@
 {
-  "dropbox_key":"j0zetok7l69qxc4"
+	"templates":{
+		"index.html":{
+			"title":"text",
+			"content":"md",
+			"date":"date"
+		}
+	}
 }

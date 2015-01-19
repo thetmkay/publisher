@@ -1,13 +1,17 @@
-.overlay {
+#gnp-overlay {
  width: 100%;
+ max-width: 300px;
  height: 100%;
  position: fixed;
  top: 0;
- left: 0;
  right: 0;
-// opacity: 0.5;
- //background-color: black;
+ background-color: white;
 }
+
+#gnp-overlay.hidden {
+ display: none;
+}
+
 .gnp-watch {
  display: inherit;
 }

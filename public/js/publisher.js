@@ -1,27 +1,30 @@
- 
-var watch_list = [];
-var context = new Context();
+
+var nunjucks = require('./nunjucks');
+var marked = require('./marked');
+
+var watchlist = require('./watchlist')();
+var context = require('./context')(globals.template);
+var socket = io();
 
 
 function renderFile(extension, text) {
-  console.log(extension);
   switch(extension) {
     case 'md': 
        return marked(text);
     default:
        return text;
   }
-
 }
 
 function createOverlay() {
  var body = document.body;
- var div = document.createElement('div');
- div.classList.add('overlay');
+ var overlay = document.createElement('div');
+ overlay.id = 'gnp-overlay';
+ overlay.classList.add('hidden');
  var template = document.getElementById('form-template').content;
  var clone = document.importNode(template.querySelector('form'), true);
- div.appendChild(clone);
- body.insertBefore(div, body.firstChild);
+ overlay.appendChild(clone);
+ body.insertBefore(overlay, body.firstChild);
 }
 
 function replaceContent(key, value) {
@@ -37,11 +40,9 @@ function replaceContent(key, value) {
 
 function bindInputs() {
  var watch_inputs = document.querySelectorAll('input.gnp-input'); 
- console.log(watch_inputs);
  for(var i = 0; i < watch_inputs.length; i++) {
    var watch_input = watch_inputs[i];
    watch_input.addEventListener("input", function() {
-    console.log('hi');
     replaceContent(this.name, this.value); 
    });
  }
@@ -49,19 +50,22 @@ function bindInputs() {
 
 function bindFileReaders(){
   var file_inputs = document.querySelectorAll('input.gnp-file-input');
-  console.log(file_inputs);
-  for(var i = 0; i < file_inputs.length; i++) {
-     file_inputs[0].addEventListener('change', function() {
+
+  function readFile(){
        var selected_file = this.files[0];
        var key = this.name;
        var extension = this.getAttribute('data-gnp-type'); //alt: use actual filename extension
        var reader = new FileReader();
        reader.onload = function() {
-         var renderText = renderFile(extension, this.result);
-         replaceContent(key, renderText);
+         var rendered_text = renderFile(extension, this.result);
+         replaceContent(key,rendered_text);
        };
+       watchlist.add(selected_file, key, readFile.bind(this));
        reader.readAsText(selected_file, 'utf8');
-     });
+  }
+
+  for(var i = 0; i < file_inputs.length; i++) {
+     file_inputs[i].addEventListener('change',readFile);
   }  
 }
 
@@ -83,6 +87,28 @@ function bindPublish() {
   button.addEventListener("click", onPublish);
 }
 
+function toggleOverlay() {
+  var overlay = document.getElementById('gnp-overlay').classList.toggle('hidden');  
+}
+
+function switchContexts(context_id) {
+  var overlay = document.getElementById('gnp-overlay');
+  //switch display to other context
+  if(context.isSameContext(context_id)) {
+     console.log("Already in context");
+     return;
+  }
+
+  context.switchContext(context_id);
+  var context_obj = context.get();
+  for(var field in context_obj) {
+	replaceContent(field, context_obj[field]);
+  }
+
+
+}
+
+/*
 function addToWatchList(node, file){
   
   if(!watch_list[file]) {
@@ -101,7 +127,7 @@ function removeFromWatchList(node, file){
   var index = _.indexOf(list, node);
   watch_list.slice(index, 1);
   console.log(watch_list);
-}
+}*/
 /*
 function dropbox() {
  var client = new Dropbox.Client({
@@ -159,11 +185,40 @@ function dropbox() {
 
   }); 
 }
+
+function watch(filename) {
+  socket.emit('watch file', filename);
+}
 */
+
+function bindKeys() {
+/*
+  var inputs = document.querySelectorAll('input')
+  for(var i = 0; i < inputs.length; i++) {
+    inputs[i].addEventListener("keypress", function(event) {
+      event.stopDefaultPropogation();
+    }
+  }
+*/
+  window.addEventListener("keypress", function(event) {
+    if(document.activeElement.tagName.toLowerCase() === 'input' ||
+       document.activeElement.tagName.toLowerCase() === 'select') {
+      return true;
+    }
+    //todo: support newer standards (ie event.key)
+    if(event.which === 45) { // '-' key
+      toggleOverlay();
+    } else if(event.which <= 57 && event.which >= 48) { // '0' to '9' keys
+      switchContexts(event.which - 48);
+    }
+  });
+}
 
 createOverlay();
 bindInputs();
 bindFileReaders();
 bindPublish();
+bindKeys();
 //dropbox();
-
+//watch();
+setInterval(watchlist.poll, 3000);
