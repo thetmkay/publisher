@@ -10,6 +10,8 @@
   {% elif field.type == 'date' %}
   <input type="date" class="gnp-input" data-gnp-type="{{field.type}}" name="{{field.legend}}"/>
   {% elif field.type == 'md' %}
+  <input type="file" class="gnp-file-input" accept=".{{field.type}}" data-gnp-type="{{field.type}}" name="{{field.legend}}"/>
+  {% elif false %}
   <select class="gnp-input" name="{{field.legend}}" data-gnp-type="{{field.type}}"></select>
   {% endif %}
 </fieldset>

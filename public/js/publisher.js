@@ -3,7 +3,16 @@ var watch_list = [];
 var context = new Context();
 
 
+function renderFile(extension, text) {
+  console.log(extension);
+  switch(extension) {
+    case 'md': 
+       return marked(text);
+    default:
+       return text;
+  }
 
+}
 
 function createOverlay() {
  var body = document.body;
@@ -36,6 +45,24 @@ function bindInputs() {
     replaceContent(this.name, this.value); 
    });
  }
+}
+
+function bindFileReaders(){
+  var file_inputs = document.querySelectorAll('input.gnp-file-input');
+  console.log(file_inputs);
+  for(var i = 0; i < file_inputs.length; i++) {
+     file_inputs[0].addEventListener('change', function() {
+       var selected_file = this.files[0];
+       var key = this.name;
+       var extension = this.getAttribute('data-gnp-type'); //alt: use actual filename extension
+       var reader = new FileReader();
+       reader.onload = function() {
+         var renderText = renderFile(extension, this.result);
+         replaceContent(key, renderText);
+       };
+       reader.readAsText(selected_file, 'utf8');
+     });
+  }  
 }
 
 function bindSave() {
@@ -75,10 +102,10 @@ function removeFromWatchList(node, file){
   watch_list.slice(index, 1);
   console.log(watch_list);
 }
-
+/*
 function dropbox() {
  var client = new Dropbox.Client({
-    key: "j0zetok7l69qxc4"
+    key: dropbox_key//"j0zetok7l69qxc4"
  });
  client.authenticate(function(error, client) {
     if (error) {
@@ -132,9 +159,11 @@ function dropbox() {
 
   }); 
 }
+*/
 
 createOverlay();
 bindInputs();
+bindFileReaders();
 bindPublish();
-dropbox();
+//dropbox();
 

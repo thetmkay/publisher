@@ -5,8 +5,9 @@
   var express = require('express'),
     http = require('http'),
     path = require('path'),
-    cons = require('consolidate');
-    mid = require('./prepare.js');
+    cons = require('consolidate'),
+    pp_config = require('./pp_config'),
+    pp = require('./prepare')(pp_config);
   var app = module.exports = express();
 
   /**
@@ -14,7 +15,7 @@
    */
   // all environments
   app.set('port', process.env.PORT || 3000);
-  app.engine('html', mid);
+  app.engine('html', pp.nunjucks);
   app.set('view engine', 'html');
   app.use(express.static(path.join(__dirname, 'public')));
   // app.use(app.router);
