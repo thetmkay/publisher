@@ -82,6 +82,18 @@ function bindPublish() {
 
   function onPublish() {
     console.log(context.print());
+
+    var req = new XMLHttpRequest();
+    req.open('POST', '/publish/remote');
+    req.onload = function(){ 
+      console.log(this.responseText); 
+    }
+
+    req.addEventListener('error', function(error) {
+	console.log(error);
+    });
+    req.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+    req.send(context.get());
   }
 
   button.addEventListener("click", onPublish);
@@ -186,10 +198,12 @@ function dropbox() {
   }); 
 }
 
-function watch(filename) {
-  socket.emit('watch file', filename);
-}
 */
+function watch(filename) {
+  socket.on('connected', function(msg) {
+	console.log(msg);
+  });
+}
 
 function bindKeys() {
 /*

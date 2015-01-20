@@ -111,18 +111,13 @@ module.exports = function PublishPreview(settings){
 	function setSockets(io) {
 	  io.on('connection', function(socket) {
 	   console.log('connected');
-           socket.on('watch file', function(path) {
-	     console.log('path: ' + path);
-             watch(path, function(fn) {
-		console.log(fn);
-	     });
-           }); 
+           io.emit('test'); 
 	  });
 	  
         }
 
 	module.nunjucks = render;
-	module.watch = setSockets;
+	module.listen = setSockets;
 
 	return module;
 }
