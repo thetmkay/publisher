@@ -1,9 +1,11 @@
 {
 	"templates":{
 		"index.html":{
-			"title":"text",
-			"content":"md",
-			"date":"date"
+			"fields":{
+				"title":"text",
+				"content":"md",
+				"date":"date"
+			}
 		}
 	}
 }

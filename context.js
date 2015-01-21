@@ -38,7 +38,7 @@ module.exports = function createContext(template) {
 
    stretchTo(index);
 
-   return list[c_index];
+   return list[index];
   }
   module.get = get;
 

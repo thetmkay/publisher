@@ -11,7 +11,7 @@
     //io = require('socket.io')(server),
     pp_config = require('./pp_config'),
     pp = require('./prepare')(pp_config),
-    db = require('./db')(user, password);
+    db = require('./db')('', '');
 
   /**
    * Configuration
@@ -29,7 +29,8 @@
 
   app.get('/:name', function(req,res) {
     console.log('rendering ' + req.params.name);
-    res.render(req.params.name);
+//    res.render(req.params.name);
+	res.send('hello');
   })
 
   app.get('/', function(req,res) {
@@ -40,4 +41,4 @@
 
   var server = app.listen(app.get('port'));
   var io = require('socket.io')(server);
-//  pp.watch(io);
+  pp.listen(io);
