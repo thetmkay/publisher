@@ -1,39 +1,47 @@
-module.exports = function PublishPreview(settings){
+module.exports = function PublishPreview(app,io, settings){
 
+
+	//imports
         var fs = require('fs'),
 	    path = require('path'),
-	    rooms = [], 
-	    contexts = [],
-	    htmls = {},
-	    publish = settings.publish || defaultPublish,
-	    save = settings.save || defaultSave,
+	    //io = require('socket-io'),
             _ = require('underscore'),
 	    createContext = require('./context');
 
-        var module = {};
+	var rooms, contexts, htmls;
 
-	function getBasename(path) {
-	  var views_dir = settings.view_dir || 'views';
-	  var path_reg = new RegExp('^.*/' + views_dir + '/(.*)$');
-	  var match = path.match(path_reg);
-	  console.log('match: ' + match[1]);
-	  return 'index.html';
+	var defaults = {
+		publish: defaultPublish,
+		save: defaultSave,
+		views: app.get('views'),
+		engines: {},
+		templates: {},
+		defaultExt: app.get('view engine')
+	};
+
+	function init() {
+	    rooms = []; 
+	    contexts = [];
+	    htmls = {};
+
+	    settings = settings || {};	 
+	    console.log(settings);
+	    _.extend(defaults, settings);
+	    settings = defaults;
+	    console.log(settings);
 	}
 
 	function renderString(name) {
-		return require('nunjucks').renderString;
+		var extension = path.extname(name) || settings.defaultExt;
+		return settings.engines[extension] || require('nunjucks').renderString;
 	}
 
 	function render(filepath, ops, fn) {
-	  var basename = getBasename(filepath),
+	  var basename = path.relative(settings.views, filepath),
 	      globals = {},
-	      template = settings['templates'][basename],
+	      template = settings['templates'][basename] || {},
 	      renderFn = renderString(basename);
 
- 	 if(_.contains(rooms,basename)) {
-	    rooms.push(basename);
-	  }
-	 
 	 initTemplate(basename);
 	 /* if(template) {
 		globals.template = _.each(template, function(type,field, t) {
@@ -45,8 +53,10 @@ module.exports = function PublishPreview(settings){
 	  fs.readFile(filepath, {encoding:'utf8'},function(error,data){
 	   if(error) {
 	    console.error(error);
-	    return;
+	    return fn('Cannot get ' + basename);
 	   }   
+
+	   console.log(data);
 
 	   function rigMarkup(match, p0, p1, p2, p3, p4, p5, p6, offset, string) {
 		var head = p0 + p1 + renderStyle() + p2;
@@ -145,13 +155,13 @@ module.exports = function PublishPreview(settings){
 	  });
 	}
 
-	function setSockets(socket_io) {
+	/*function setSockets(socket_io) {
 	  io = socket_io;
 	  rooms = _.uniq(rooms);
 	  _.each(rooms, function(room_name, index, list) {
 		initSocket(room_name);	
 	  });
-        }
+        }*/
 
 	function initSocket(name) {
 	 //console.log(name);
@@ -166,10 +176,17 @@ module.exports = function PublishPreview(settings){
 	      renderContext(name, context_id);
             });
 	    socket.on('publish context', function(context_id) {
-		publish(contexts[name].get(context_id));
+		settings.publish({},contexts[name].get(context_id), function(err) {
+		  if (err) throw err;
+  		  console.log('Published');
+		});
 	    });
 	    socket.on('save context', function(context_id) {
-		save(contexts[name].get(context_id));
+		var savename = getRoom(name) + '-' + context_id;
+		settings.save(savename, contexts[name].get(context_id), function(err) {
+			if (err) throw err;
+			console.log('Saved in ' + savename);
+		});
 	    });
 	 })
 	}
@@ -182,12 +199,14 @@ module.exports = function PublishPreview(settings){
 	     io.to(getRoom(name)).emit('change dom', context_id, headHTML, 'head'); 
 	}
 
-	function defaultPublish(json) {
+	function defaultPublish(key, json, fn) {
 		console.log(json);
+		fn(false);
 	}
 	
-	function defaultSave(json) {
+	function defaultSave(title, json, fn) {
 		console.log(json)
+		fn(false);
 	}
 
 	function getRoom(name) {
@@ -200,19 +219,18 @@ module.exports = function PublishPreview(settings){
 	function initTemplate(name) {
 	 
 	  var context_template = {};
-	  _.each(settings.templates[name].fields, function(elem, key) {
-	     context_template[key] = '';
-	  });
+
+	  if(settings.templates[name]) {
+	     _.each(settings.templates[name].fields, function(elem, key) {
+	        context_template[key] = '';
+	     });
+	  }
 
 	  if(!contexts[name]) {
 	    contexts[name] = createContext(context_template); 
 	  }
 	
-  	  console.log(contexts);
-
-	  if(io) {
-	    initSocket(name);
-	  }
+	  initSocket(name);
        }	
 
 	function getSettingsFor(name) {
@@ -221,8 +239,15 @@ module.exports = function PublishPreview(settings){
 	  return options;
 	}
 
-	module.nunjucks = render;
-	module.listen = setSockets;
+	function middleware(req, res, next) {
+	    var filepath = path.join(settings.views, req.path);
+	    render(filepath, {}, function(err,html) {
+		console.log(html);
+		res.send(html);
+	    });
+	}
 
-	return module;
+	init();
+
+	return middleware;
 }

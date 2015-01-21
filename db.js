@@ -1,12 +1,17 @@
 module.exports = function(user, password) {
 
   var module = {};
+
+  //imports
+  var path = require('path'),
+      fs = require('fs'),
+      mongo = require('mongoskin');
  
   var dbUrl = 'mongodb://' + user + ':' + password + '@kahana.mongohq.com:10075/humblr';
 
-  var db = require('mongoskin').db(dbUrl, { w: 1 });
+  var db = mongo.db(dbUrl, { w: 1 });
 
-  function savePost(post, fn) {
+  function publishPost(key, post, fn) {
 
 	var collection = db.collection('posts');
 	//todo: add key support
@@ -30,6 +35,12 @@ module.exports = function(user, password) {
 	});
   }
 
+  function savePost(title, post, fn) {
+	var filename = path.join(__dirname, 'db', title + '.json');
+	fs.writeFile(filename, JSON.stringify(post), {encoding: 'utf8'}, fn);
+  }
+
+  module.publishPost = publishPost;
   module.savePost = savePost;
 
   return module;

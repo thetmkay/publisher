@@ -9,23 +9,27 @@
     cons = require('consolidate'),
     //server = app.listen(app.get('port')),
     //io = require('socket.io')(server),
-    pp_config = require('./pp_config'),
-    pp = require('./prepare')(pp_config),
-    db = require('./db')('', '');
-
-  /**
+    pp = require('./prepare'), 
+    db = require('./db')('', ''),
+    server = http.createServer(app),
+    io = require('socket.io')(server);
+ 
+/**
    * Configuration
    */
   // all environments
   app.set('port', process.env.PORT || 3000);
-  app.engine('html', pp.nunjucks);
+  app.engine('html', cons.nunjucks);
   //app.watch = pp.watch;
   app.set('view engine', 'html');
   app.use(express.static(path.join(__dirname, 'public')));
   // app.use(app.router);
 
- // app.use('/preview', pp.initMiddleware);
-  app.use('/publish', require('./publish')(db.savePost, db.savePost));
+ var pp_config = require('./pp_config');
+ pp_config.publish = db.publishPost;
+ pp_config.save = db.savePost;
+
+ app.use('/preview', pp(app, io, pp_config));
 
   app.get('/:name', function(req,res) {
     console.log('rendering ' + req.params.name);
@@ -39,6 +43,7 @@
 
   //module.exports = app;
 
-  var server = app.listen(app.get('port'));
-  var io = require('socket.io')(server);
-  pp.listen(io);
+    server.listen(app.get('port'), function() {
+	console.log('Server is listening on port ' + (app.get('port') || 3000));
+  });
+
