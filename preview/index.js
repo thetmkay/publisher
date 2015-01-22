@@ -6,7 +6,7 @@ module.exports = function PublishPreview(app,io, settings){
 	    path = require('path'),
 	    //io = require('socket-io'),
             _ = require('underscore'),
-	    createContext = require('./context');
+	    createContext = require('./js/context');
 
 	var rooms, contexts, htmls;
 
@@ -72,9 +72,8 @@ module.exports = function PublishPreview(app,io, settings){
 
 	   function renderScripts() {
 	     //var script = '<script>console.log(1)</script>';
-	     var script = fs.readFileSync(__dirname + '/script.html', {encoding:'utf8'});     
-		
-	     return renderFn(script, { name:basename });     
+	     var script = fs.readFileSync(__dirname + '/views/script.html', {encoding:'utf8'});     
+	     return renderFn(script, {});     
 	   }
 	   
 	   /*function insertClass(match, p1, p2, p3, p4, offset, string){
@@ -102,7 +101,7 @@ module.exports = function PublishPreview(app,io, settings){
 
 	   function renderOverlayTemplate() {
 
-	    var overlay = fs.readFileSync(__dirname + '/overlay.html', {encoding: 'utf8'});
+	    var overlay = fs.readFileSync(__dirname + '/views/overlay.html', {encoding: 'utf8'});
 	    
 	    var keys = Object.keys(template.fields);
 	    var fields = [];
@@ -122,7 +121,7 @@ module.exports = function PublishPreview(app,io, settings){
 	   }
 
 	   function renderStyle() {
-	    var css = fs.readFileSync(__dirname + '/style.css', {encoding:'utf8'});
+	    var css = fs.readFileSync(__dirname + '/css/style.css', {encoding:'utf8'});
 	    return '<style>' + css + '</style>';
 	   }
 	//   var headText = data.substring(0,data.indexOf("<body>"));

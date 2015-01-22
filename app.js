@@ -9,7 +9,7 @@
     cons = require('consolidate'),
     //server = app.listen(app.get('port')),
     //io = require('socket.io')(server),
-    pp = require('./prepare'), 
+    pp = require('./preview'), 
     db = require('./db')('', ''),
     server = http.createServer(app),
     io = require('socket.io')(server);

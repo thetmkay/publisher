@@ -1,38 +1,34 @@
 {
-  "name": "nodeprototype",
-  "version": "0.0.0",
-  "description": "nodeprototype =============",
-  "main": "server.js",
+  "name": "publisher",
+  "version": "0.0.3",
+  "description": "publisher =============",
+  "main": "preview/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js"
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/thetmkay/nodeprototype.git"
+    "url": "git://github.com/thetmkay/publisher.git"
   },
   "author": "thetmkay@gmail.com",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/thetmkay/nodeprototype/issues"
+    "url": "https://github.com/thetmkay/publisher/issues"
   },
-  "homepage": "https://github.com/thetmkay/nodeprototype",
+  "homepage": "https://github.com/thetmkay/publisher",
   "dependencies": {
-    "consolidate": "~0.10.0",
     "express": "~4.9.8",
-    "jsdom": "^3.0.1",
+    "html-virtualize": "^0.3.0",
     "mongodb": "~1.4.28",
     "mongoskin": "~1.4.11",
-    "node-watch": "^0.3.4",
     "nunjucks": "~1.1.0",
     "socket.io": "^1.3.1",
     "underscore": "~1.7.0",
-    "vdom-virtualize": "0.0.6"
+    "virtual-dom": "^1.2.0"
   },
   "devDependencies": {
     "gulp": "~3.8.10",
-    "gulp-browatchify": "0.0.0",
-    "html-virtualize": "^0.3.0",
-    "virtual-dom": "^1.2.0"
+    "gulp-browatchify": "0.0.0"
   }
 }

@@ -1,5 +1,4 @@
 
-console.log(name);
 var socket = io();
 var patch = require('virtual-dom/patch');
 var diff = require('virtual-dom/diff');
