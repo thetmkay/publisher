@@ -26,10 +26,8 @@ module.exports = function PublishPreview(app,io, settings){
 	    htmls = {};
 
 	    settings = settings || {};	 
-	    console.log(settings);
 	    _.extend(defaults, settings);
 	    settings = defaults;
-	    console.log(settings);
 	}
 
 	function renderString(name) {
@@ -120,7 +118,6 @@ module.exports = function PublishPreview(app,io, settings){
 	    socket.join(getRoom(name));
 	    socket.on('update context', function(context_id,key, value, filename) {
 	      if(filename) {
-		console.log(filename);
 		filecontexts[name].update(key, filename);
 	      }
 	      contexts[name].update(context_id, key, value);
