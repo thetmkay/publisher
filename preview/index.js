@@ -118,7 +118,7 @@ module.exports = function PublishPreview(app,io, settings){
 	    socket.join(getRoom(name));
 	    socket.on('update context', function(context_id,key, value, filename) {
 	      if(filename) {
-		filecontexts[name].update(key, filename);
+		filecontexts[name].update(context_id,key, filename);
 	      }
 	      contexts[name].update(context_id, key, value);
 	      renderContext(name, context_id);
