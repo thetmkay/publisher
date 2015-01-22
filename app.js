@@ -33,8 +33,8 @@
 
   app.get('/:name', function(req,res) {
     console.log('rendering ' + req.params.name);
-//    res.render(req.params.name);
-	res.send('hello');
+  res.render(req.params.name);
+//	res.send('hello');
   })
 
   app.get('/', function(req,res) {

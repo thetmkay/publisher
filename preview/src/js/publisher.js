@@ -14,9 +14,10 @@ function init() {
 	var context_id = 0;
 
 	socket.on('change dom', function(id , new_html, selector) {
-	  if(id !== context_id) {
+	  if(id !== context_id || !new_html) {
 		return;
 	  }
+	
 	  var new_tree = virtualize(new_html);
 	  var container = document.querySelector(selector);
 	  var patches = diff(virtualize(container.outerHTML), new_tree); 
@@ -31,37 +32,19 @@ function init() {
 	       return text;
 	  }
 	}
-/*
-	function createOverlay() {
-	 var body = document.body;
-	 var overlay = document.createElement('div');
-	 overlay.id = 'gnp-overlay';
-	 overlay.classList.add('hidden');
-	 var template = document.getElementById('form-template').content;
-	 var clone = document.importNode(template.querySelector('form'), true);
-	 overlay.appendChild(clone);
-	 body.insertBefore(overlay, body.firstChild);
-	}
-*/
-	function updateContext(key, value) {
-	//   var update_targets = document.querySelectorAll("[data-gnp-key=" + key + "]");
-	   //context.update(key, value); 
-	  socket.emit('update context', context_id, key, value);
-	  /* if(update_targets) {
-	     for(var i = 0; i < update_targets.length; i++) {
-	      var template = unescape(update_targets[i].getAttribute('data-gnp-value'));
-	      update_targets[i].innerHTML = nunjucks.renderString(template, context.get());
-	     }
-	   }*/
+
+	function updateContext(key, value, filename) {
+	  socket.emit('update context', context_id, key, value, filename);
 	}
 
 	function bindInputs() {
 	 var watch_inputs = document.querySelectorAll('input.gnp-input'); 
 	 for(var i = 0; i < watch_inputs.length; i++) {
 	   var watch_input = watch_inputs[i];
-	   watch_input.addEventListener("input", function() {
+	   watch_input.addEventListener('input', function() {
 	    updateContext(this.name, this.value); 
 	   });
+	   watch_input.addEventListener('blur', hideInput);
 	 }
 	}
 
@@ -75,15 +58,51 @@ function init() {
 	       var reader = new FileReader();
 	       reader.onload = function() {
 		 var rendered_text = renderFile(extension, this.result);
-		 updateContext(key,rendered_text);
+		 updateContext(key,rendered_text, selected_file.name);
 	       };
 	       watchlist.add(selected_file, key, readFile.bind(this));
 	       reader.readAsText(selected_file, 'utf8');
+	       hideInputElement.call(this, selected_file.name);
 	  }
 
 	  for(var i = 0; i < file_inputs.length; i++) {
 	     file_inputs[i].addEventListener('change',readFile);
 	  }  
+	}
+	
+	function hideInputElement(value) {
+		var input = this;
+
+		var container = input.parentNode;
+		container.querySelector('.gnp-input-value').innerHTML = value;
+		container.classList.remove('trigger-edit');
+
+	}
+
+	function hideInput() {
+		var value = this.value;
+		hideInputElement.call(this, value);
+	}
+
+	function onFieldClick() {
+		console.log('click');
+		var mod = this.querySelector('.gnp-input-mod');
+		mod.classList.add('trigger-edit');
+		var input = this.querySelector('.gnp-input, .gnp-file-input');
+		var value = this.querySelector('.gnp-input-value').innerHTML;
+		if(input.type === 'file'){
+			value = '';
+		}
+		input.value = value;
+		input.focus();
+	}
+
+	function bindFields() {
+		var fields = document.querySelectorAll('.gnp-json-field'); 
+
+		for(var i = 0; i < fields.length; i++) {
+			fields[i].addEventListener('click', onFieldClick);	
+		}
 	}
 
 	function bindSave() {
@@ -234,6 +253,7 @@ function init() {
 //	createOverlay();
 	function bindAll() {
 	  bindInputs();
+	  bindFields();
 	  bindFileReaders();
 	  bindPublish();
 	  bindSave();

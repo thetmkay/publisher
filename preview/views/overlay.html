@@ -1,22 +1,26 @@
 <div id="gnp-overlay">
- <form>
-  {% for field in fields %}
-  <fieldset>
-  <legend>
-   {{field.legend}} 
-  </legend>
-  {% if field.type == 'text' %}
-  <input type="text" class="gnp-input" data-gnp-type="{{field.type}}" name="{{field.legend}}" value="{{opentag}} {{field.legend}} {{ closetag }}" />
-  {% elif field.type == 'date' %}
-  <input type="date" class="gnp-input" data-gnp-type="{{field.type}}" name="{{field.legend}}" value="{{opentag}} {{field.legend}} {{ closetag }}"/>
-  {% elif field.type == 'md' %}
-  <input type="file" class="gnp-file-input" accept=".{{field.type}}" data-gnp-type="{{field.type}}" name="{{field.legend}}"/>
-  {% elif false %}
-  <select class="gnp-input" name="{{field.legend}}" data-gnp-type="{{field.type}}"></select>
-  {% endif %}
-</fieldset>
- {% endfor %}
- <input type="button" name="save" class="gnp-button" id="gnp-save" value="save" />
- <input type="button" name="publish" class="gnp-button" id="gnp-publish" value="publish" />
- </form>
+	<div class="gnp-json-container">
+		<p class="gnp-json-open-bracket"> { </p>
+		{% for field in fields %}
+		<div class="gnp-json-field">
+			<label class="gnp-json-label">{{field.legend}}:</label>
+			<div class="gnp-input-mod">
+				{% if field.type == 'text' %}
+					<span class="gnp-input-text">"<span class="gnp-input-value">{{opentag}} {{field.legend}} {{ closetag }}</span>"&nbsp;{% if not loop.last %},{% endif %}</span>	
+					<input type="text" class="gnp-input" data-gnp-type="{{field.type}}" name="{{field.legend}}"  />
+				{% elif field.type == 'date' %}
+					<span class="gnp-input-text">"<span class="gnp-input-value">{{opentag}} {{field.legend}} {{ closetag }}</span>"&nbsp;{% if not loop.last %},{% endif %}</span>	
+					<input type="date" class="gnp-input" data-gnp-type="{{field.type}}" name="{{field.legend}}" />
+				{% elif field.type == 'md' %}
+					<span class="gnp-input-text">"<span class="gnp-input-value">{{opentag}} _gnp_files.{{field.legend}} {{ closetag }}</span>"&nbsp;{% if not loop.last %},{% endif %}</span>	
+					<input type="file" class="gnp-file-input" accept=".{{field.type}}" data-gnp-type="{{field.type}}" name="{{field.legend}}"/>
+				{% endif %}
+
+			</div>
+		</div>
+		{% endfor %}
+		<p class="gnp-json-close-bracket"> } </p>
+		<input type="button" class="gnp-button" id="gnp-save" value="save" />
+		<input type="button" class="gnp-button" id="gnp-publish" value="publish" />
+	</div>
 </div>
