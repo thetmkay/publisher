@@ -124,7 +124,7 @@ module.exports = function PublishPreview(app,io, settings){
 	      renderContext(name, context_id);
 	    });
             socket.on('switch context', function(context_id) {
-              console.log('switching context to ' + context_id);
+           //   console.log('switching context to ' + context_id);
 	      renderContext(name, context_id);
             });
 	    socket.on('publish context', function(context_id) {
@@ -217,7 +217,11 @@ module.exports = function PublishPreview(app,io, settings){
 			res.sendFile(path.join(__dirname,'public', req.path));
 			break;
 		default:
-			var filepath = path.join(settings.views, req.path);
+			var req_path = req.path;
+			if(req.path === '/'){
+				req_path = '/index';
+			}
+			var filepath = path.join(settings.views, req_path);
 			render(filepath, {}, function(err,html) {
 				res.send(html);
 			});

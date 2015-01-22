@@ -26251,7 +26251,6 @@ function init() {
 	}
 
 	function onFieldClick() {
-		console.log('click');
 		var mod = this.querySelector('.gnp-input-mod');
 		mod.classList.add('trigger-edit');
 		var input = this.querySelector('.gnp-input, .gnp-file-input');
@@ -26303,105 +26302,16 @@ function init() {
 		//no need to switch
 		return;
 	    }
-	    console.log('switch to ' + new_id);
+	    document.querySelector('[data-gnp-context="' + context_id + '"]').classList.remove('active');
+	    document.querySelector('[data-gnp-context="' + new_id + '"]').classList.add('active');
+	    //console.log('switch to ' + new_id);
 	    context_id = new_id;
 	    socket.emit('switch context', context_id);
 	}
 
-	/*
-	function addToWatchList(node, file){
-	  
-	  if(!watch_list[file]) {
-	   watch_list[file] = [];
-	  }
-
-	  watch_list[file].push(node);
-	  console.log(watch_list);
-	}
-
-	function removeFromWatchList(node, file){ 
-	  if(!watch_list[file]) {
-	   return;
-	  }
-
-	  var index = _.indexOf(list, node);
-	  watch_list.slice(index, 1);
-	  console.log(watch_list);
-	}*/
-	/*
-	function dropbox() {
-	 var client = new Dropbox.Client({
-	    key: dropbox_key//"j0zetok7l69qxc4"
-	 });
-	 client.authenticate(function(error, client) {
-	    if (error) {
-		console.log(error);
-		return;
-	    }
-
-	   function getFiles(extension, callback) {
-	     return client.search('/posts/', '.' + extension, {}, callback);
-	   }
-
-	   function convertMD() {
-	    var choice = unescape(this.value);
-
-	    addToWatchList(this,unescape(this.value));
-
-	    var selectKey = this.name;
-	    readFile(choice, function(data) {
-	      var conversion = marked(data);
-	      replaceContent(selectKey, conversion);
-	    });
-	   }
-
-	  function readFile(path, callback) {
-	    client.readFile(path, function(error, data) {
-		    if (error)
-			console.error(error)
-		    else
-			callback(data);
-	    });
-	  }
-
-	   var selectComp = document.querySelector('select.gnp-input[data-gnp-type="md"]');
-	   var extension = 'md';
-
-	   var optionPromise = new Promise(function(resolve, reject) {
-	    getFiles(extension, function(error, data) {
-	    if (error)
-	     reject(data);
-	    else
-	     resolve(data);
-	    });
-	   });
-
-	    var selectPromise = filepicker(selectComp, optionPromise);
-
-	    selectPromise.then(function(selectNode) {
-	      convertMD.call(selectNode);
-	      selectNode.addEventListener("change",convertMD);
-	    });
-
-	  }); 
-	}
-
-	function watch(filename) {
-	  socket.on('init', function(msg) {
-		console.log(msg);
-	  });
-	}
-	*/
 
 	function bindKeys() {
-	/*
-	  var inputs = document.querySelectorAll('input')
-	  for(var i = 0; i < inputs.length; i++) {
-	    inputs[i].addEventListener("keypress", function(event) {
-	      event.stopDefaultPropogation();
-	    }
-	  }
-	*/
+
 	  window.addEventListener("keypress", function(event) {
 	    if(document.activeElement.tagName.toLowerCase() === 'input' ||
 	       document.activeElement.tagName.toLowerCase() === 'select') {
@@ -26416,7 +26326,16 @@ function init() {
 	  });
 	}
 
-//	createOverlay();
+	function bindSwitches() {
+		var switches = document.querySelectorAll('.gnp-switch');
+		for(var i = 0; i < switches.length; i++) {
+			switches[i].addEventListener('click', function(e) {
+				e.preventDefault();
+				switchContexts(this.getAttribute('data-gnp-context'));
+			});
+		}
+	}
+
 	function bindAll() {
 	  bindInputs();
 	  bindFields();
@@ -26424,6 +26343,7 @@ function init() {
 	  bindPublish();
 	  bindSave();
 	  bindKeys();
+	  bindSwitches();
 	}
 	//dropbox();
 	//watch();

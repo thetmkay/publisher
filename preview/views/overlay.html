@@ -1,5 +1,10 @@
 <div id="gnp-overlay" class="hidden">
 	<div class="gnp-json-container">
+		<div class="gnp-switch-row">
+		{% for i in range(10) %}
+			<a href="#" data-gnp-context="{{i}}" class="gnp-switch{% if loop.first %} active{% endif %}">{{i}}</a>
+		{% endfor %}
+		</div>
 		<p class="gnp-json-open-bracket"> { </p>
 		{% for field in fields %}
 		<div class="gnp-json-field">

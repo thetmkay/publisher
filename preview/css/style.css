@@ -5,12 +5,6 @@
  position: fixed;
  top: 0;
  right: 0px;
- -webkit-transition: right 0.75s;
- background-color: #1C1F26;
-}
-
-#gnp-overlay.hidden {
- right: -300px;
 }
 
 .gnp-button {
@@ -35,16 +29,49 @@
 }
 
 .gnp-json-container {
+	position: absolute;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	width: 100%;
 	padding: 20px;
-	max-width: 400px;
 	height: 100%;
 	color: white;
+	-webkit-transition: left 0.75s;
+	transition: left 0.75s;
+	-moz-transition: left 0.75s;
+ 	background-color: #1C1F26;
 }
 
+#gnp-overlay.hidden .gnp-json-container{
+	left: 100%;
+}
+
+#gnp-overlay:hover .gnp-json-container {
+	left: 0%;
+}
 .gnp-json-container, .gnp-button {
 	font-size: 16px;
 	font-family: 'Inconsolata', mono-space;
 }
+.gnp-switch-row {
+	margin-bottom: 2em;
+}
+.gnp-switch {
+	color: #aaa;
+	display: inline-block;
+	padding: 4px;
+	font-size: 20px;
+}
+
+.gnp-switch:hover, .gnp-switch.active {
+	color: white;
+}
+
+.gnp-switch, .gnp-switch:hover, .gnp-switch:active, .gnp-switch:visited {
+	text-decoration: none;
+}
+
 
 .gnp-json-field {
 	padding-left: 10px;
