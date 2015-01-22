@@ -103,15 +103,16 @@ module.exports = function PublishPreview(app,io, settings){
 
 	    var overlay = fs.readFileSync(__dirname + '/views/overlay.html', {encoding: 'utf8'});
 	    
-	    var keys = Object.keys(template.fields);
 	    var fields = [];
-	    for(var i = 0; i < keys.length; i++) {
-	     var field = {};
-	     field['legend'] = keys[i];
-	     field['type'] = template.fields[keys[i]];
-	     fields.push(field);
-	    }    
-
+	    if(template.fields) {
+		    var keys = Object.keys(template.fields);
+		    for(var i = 0; i < keys.length; i++) {
+		     var field = {};
+		     field['legend'] = keys[i];
+		     field['type'] = template.fields[keys[i]];
+		     fields.push(field);
+		    }    
+	    }
 	    var renderContext = {};
 	    renderContext.fields = fields;
 	    renderContext.opentag = '{{';
