@@ -22,7 +22,6 @@ module.exports = function PublishPreview(app,io, settings){
 		templates: {},
 		defaultExt: app.get('view engine')
 	};
-	defaults.engines['md'] == defaults.engines['md'] || marked;
 
 	function init() {
 	    contexts = {};
@@ -37,7 +36,11 @@ module.exports = function PublishPreview(app,io, settings){
 	function renderString(name) {
 		var extension = path.extname(name) || settings.defaultExt;
 		
-		return settings.engines[extension].render || partialsRenderFn;
+		if(settings.engines[extension]) {
+			return settings.engines[extension].render;
+		}
+	
+		return partialsRenderFn;
 	}
 
 	function render(filepath, ops, fn) {
@@ -158,7 +161,7 @@ module.exports = function PublishPreview(app,io, settings){
 	function renderFileFn(filename) {
 		var extension = path.extname(filename)
 		switch(extension) {
-		case 'md':
+		case '.md':
 			return marked;
 		default :
 			return renderString(filename);
