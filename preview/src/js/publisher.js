@@ -3,7 +3,7 @@ var socket = io();
 var patch = require('virtual-dom/patch');
 var diff = require('virtual-dom/diff');
 var virtualize = require('html-virtualize');
-var marked = require('./marked');
+
 
 init();
 
@@ -23,15 +23,6 @@ function init() {
 	  var patches = diff(virtualize(container.outerHTML), new_tree); 
 	  patch(container,patches);
 	});
-
-	function renderFile(extension, text) {
-	  switch(extension) {
-	    case 'md': 
-	       return marked(text);
-	    default:
-	       return text;
-	  }
-	}
 
 	function updateContext(key, value, filename) {
 	  socket.emit('update context', context_id, key, value, filename);
@@ -57,8 +48,9 @@ function init() {
 	       var extension = this.getAttribute('data-gnp-type'); //alt: use actual filename extension
 	       var reader = new FileReader();
 	       reader.onload = function() {
-		 var rendered_text = renderFile(extension, this.result);
-		 updateContext(key,rendered_text, selected_file.name);
+		 socket.emit('convert file', this.result, selected_file.name, context_id, key);
+//		 var rendered_text = renderFile(extension, this.result);
+//		 updateContext(key,rendered_text, selected_file.name);
 	       };
 	       watchlist.add(selected_file, key, readFile.bind(this));
 	       reader.readAsText(selected_file, 'utf8');

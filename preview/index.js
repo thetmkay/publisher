@@ -6,8 +6,11 @@ module.exports = function PublishPreview(app,io, settings){
 	    path = require('path'),
 	    //io = require('socket-io'),
             _ = require('underscore'),
+	    marked = require('./js/marked'),
 	    partialsRenderFn = require('nunjucks').renderString,
 	    createContext = require('./js/context');
+
+	marked.setOptions({ smartypants: true});
 
 	var rooms, contexts, htmls, filecontexts;
 
@@ -19,6 +22,7 @@ module.exports = function PublishPreview(app,io, settings){
 		templates: {},
 		defaultExt: app.get('view engine')
 	};
+	defaults.engines['md'] == defaults.engines['md'] || marked;
 
 	function init() {
 	    contexts = {};
@@ -127,6 +131,14 @@ module.exports = function PublishPreview(app,io, settings){
            //   console.log('switching context to ' + context_id);
 	      renderContext(name, context_id);
             });
+	    socket.on('convert file', function(contents, filename, context_id, key) {
+	      var renderedText = renderFileFn(filename)(contents);
+	      contexts[name].update(context_id, key, renderedText);
+	      filecontexts[name].update(context_id, key, filename);
+
+	      renderContext(name, context_id); 
+	      
+	    });
 	    socket.on('publish context', function(context_id) {
 		settings.publish({},contexts[name].get(context_id), function(err) {
 		  if (err) throw err;
@@ -141,6 +153,16 @@ module.exports = function PublishPreview(app,io, settings){
 		});
 	    });
 	 })
+	}
+	
+	function renderFileFn(filename) {
+		var extension = path.extname(filename)
+		switch(extension) {
+		case 'md':
+			return marked;
+		default :
+			return renderString(filename);
+		}
 	}
 
 	function renderContext(name, context_id) {

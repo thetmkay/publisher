@@ -26170,6 +26170,9 @@ var patch = require('virtual-dom/patch');
 var diff = require('virtual-dom/diff');
 var virtualize = require('html-virtualize');
 var marked = require('./marked');
+marked.setOptions({
+smartypants: true
+});
 
 init();
 
